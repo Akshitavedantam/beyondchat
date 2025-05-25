@@ -5,7 +5,7 @@ import {
   PaperAirplaneIcon,
   ChatBubbleLeftRightIcon,
   UserGroupIcon,
-  SparklesIcon, // Re-add SparklesIcon for AI panel
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 
 const conversationsDataInitial = [
@@ -96,13 +96,14 @@ export default function ChatLayout() {
     },
   ]);
   const [aiInput, setAiInput] = useState("");
-  const [aiIsTyping, setAiIsTyping] = useState(false); // New state for AI typing indicator
+  const [aiIsTyping, setAiIsTyping] = useState(false);
   const aiMessagesEndRef = useRef(null);
 
   useEffect(() => {
     aiMessagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [aiMessages, aiIsTyping]);
 
+  // Simulated AI response logic
   async function handleAiSend() {
     if (!aiInput.trim()) return;
 
@@ -113,57 +114,38 @@ export default function ChatLayout() {
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
-    // Add user message to UI immediately
     setAiMessages((prev) => [...prev, userMessage]);
-
-    // Map messages to OpenAI's 'role' and 'content' format for the backend
-    const messagesForApi = [...aiMessages, userMessage].map(msg => ({
-        role: msg.from === 'user' ? 'user' : 'assistant', // Assuming 'ai' from backend maps to 'assistant'
-        content: msg.text,
-    }));
-
     setAiInput("");
     setAiIsTyping(true); // Show AI typing indicator
 
-    try {
-      // **** UPDATED FETCH URL TO YOUR BACKEND ENDPOINT ****
-      const response = await fetch('http://localhost:3001/ask-ai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ messages: messagesForApi }), // Send all messages for context
-      });
+    // Simulate network delay for AI response
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.reply || 'Failed to get AI response from backend');
-      }
+    // Generate a simple AI response based on user input
+    let aiReplyText = "I'm not sure how to respond to that. Can you rephrase?";
+    const lowerCaseInput = userMessage.text.toLowerCase();
 
-      const data = await response.json();
-      const aiReply = {
-        id: messagesForApi.length, // Use length of all messages as ID
-        from: "ai",
-        text: data.reply, // Your backend sends back { reply: "..." }
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
-
-      setAiMessages((prev) => [...prev, aiReply]);
-    } catch (error) {
-      console.error("Error fetching AI response:", error);
-      // Optionally, add an error message to the chat
-      setAiMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length,
-          from: "ai",
-          text: "Sorry, I couldn't get a response from the AI. Please try again.",
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        },
-      ]);
-    } finally {
-      setAiIsTyping(false); // Hide AI typing indicator
+    if (lowerCaseInput.includes("hello") || lowerCaseInput.includes("hi")) {
+      aiReplyText = "Hello there! How can I assist you?";
+    } else if (lowerCaseInput.includes("help") || lowerCaseInput.includes("support")) {
+      aiReplyText = "I can help with general inquiries. What specific support do you need?";
+    } else if (lowerCaseInput.includes("order")) {
+      aiReplyText = "To assist with your order, please provide your order number.";
+    } else if (lowerCaseInput.includes("thank you")) {
+      aiReplyText = "You're welcome!";
+    } else if (lowerCaseInput.includes("weather")) {
+      aiReplyText = "I don't have real-time weather information, but I can answer other questions!";
     }
+
+    const aiReply = {
+      id: aiMessages.length + 1, // Ensure unique ID
+      from: "ai",
+      text: aiReplyText,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setAiMessages((prev) => [...prev, aiReply]);
+    setAiIsTyping(false); // Hide AI typing indicator
   }
 
   function handleAiInputKeyDown(e) {
@@ -207,8 +189,7 @@ export default function ChatLayout() {
           placeholder="Search conversations..."
           className="w-full mb-4 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
-        {/* Removed overflow-y-auto from here, content might be clipped */}
-        <ul className="h-[calc(100%-60px)]"> {/* Adjusted height to fit within parent */}
+        <ul className="h-[calc(100%-60px)] overflow-y-auto">
           {filteredConversations.map(({ id, customer, lastMessage, timestamp, status }) => (
             <li
               key={id}
@@ -247,8 +228,7 @@ export default function ChatLayout() {
               <h2 className="text-lg font-semibold truncate">{selectedConversation.customer}</h2>
             </header>
 
-            {/* Removed overflow-y-auto and scrollbar classes from here, content will be clipped */}
-            <div className="flex-1 pr-1 space-y-4 mb-4 h-[calc(100%-120px)]"> {/* Adjusted height */}
+            <div className="flex-1 pr-1 space-y-4 mb-4 overflow-y-auto">
               {selectedConversation.messages.map(({ from, text, time }, idx) => (
                 <div
                   key={idx}
@@ -332,8 +312,7 @@ export default function ChatLayout() {
           <h2 className="text-lg font-semibold">AI Assistant</h2>
         </header>
 
-        {/* Removed overflow-y-auto and scrollbar classes from here, content will be clipped */}
-        <div className="flex-1 space-y-3 mb-4 h-[calc(100%-120px)]"> {/* Adjusted height */}
+        <div className="flex-1 space-y-3 mb-4 overflow-y-auto">
           {aiMessages.map(({ id, from, text, time }) => (
             <div
               key={id}
@@ -347,7 +326,7 @@ export default function ChatLayout() {
               <span className="text-xs block mt-1 text-gray-600 dark:text-gray-400">{time}</span>
             </div>
           ))}
-          {aiIsTyping && ( // AI typing indicator
+          {aiIsTyping && (
             <div className="italic text-gray-500 dark:text-gray-400 ml-2">AI is typing...</div>
           )}
           <div ref={aiMessagesEndRef} />
@@ -377,7 +356,7 @@ export default function ChatLayout() {
           <button
             type="submit"
             className="p-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white disabled:bg-purple-400"
-            disabled={!aiInput.trim() || aiIsTyping} // Disable send button while AI is typing
+            disabled={!aiInput.trim() || aiIsTyping}
           >
             <PaperAirplaneIcon className="h-5 w-5 rotate-45" />
           </button>
