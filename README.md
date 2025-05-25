@@ -2,8 +2,8 @@
 
 ## 🌐 Live Demo
 
-Experience BeyondChat live: **[YOUR_DEPLOYED_LINK_HERE]**  
-_(e.g., `https://yourname.vercel.app/beyondchat`)_
+Experience BeyondChat live: "https://beyondchat-001.vercel.app/"
+
 
 ---
 
@@ -58,7 +58,6 @@ It replicates the functionality and feel of modern support tools like **Intercom
 -  Styled with **Tailwind CSS** using utility-first approach.
 -  Icons via **Heroicons**
 -  State managed with **React Hooks**
--  Built-in **AI backend-ready POST** API logic (`/ask-ai`)
 -  Modular & clean code for scalability
 
 ---
@@ -73,7 +72,7 @@ It replicates the functionality and feel of modern support tools like **Intercom
 -  **Instant Transitions**: Scrolls, hover effects, chat bubble updates are buttery smooth.
 -  **Mobile-First Nav**: Thoughtfully designed to work *great* on phones.
 -  **No refresh needed**: Message state updates instantly.
--  **Context-Aware AI Messaging**: Structuring queries to backend with full chat context — ready for OpenAI or any LLM.
+
 
 ---
 
@@ -85,8 +84,7 @@ It replicates the functionality and feel of modern support tools like **Intercom
 | Styling | Tailwind CSS |
 | Icons | Heroicons |
 | State Management | React Hooks (`useState`, `useEffect`, `useRef`) |
-| API Handling | Native `fetch` |
-| AI Endpoint | Placeholder at `http://localhost:3001/ask-ai` |
+
 
 ---
 
